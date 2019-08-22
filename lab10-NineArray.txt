@@ -10,7 +10,7 @@
 
 클래스이름:ProcessNineArray
 
-	+void processInputs() 를 작성
+	+결정 processInputs(결정) 를 작성
 	
 	 1. prcessInputs 메소드의 매개변수는 
 	    자신이 필요하다고 생각되는 형태로 받을 것
