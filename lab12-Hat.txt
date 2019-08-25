@@ -4,10 +4,10 @@
 테이블명 : hat
 
  컬럼 이름, 컬타입(크기), 제약조건 이름, 제약조건 타입, 제약조건 구체 내용
- hatid      VARCHAR2(5)   pk_hat         PRIMARY KEY
+ hat_id      VARCHAR2(5)   pk_hat         PRIMARY KEY
  type       VARCHAR2(1)   ck_hat_type    CHECK          'B', 'S', 'H', 'C', 'F' 만 등장가능
  material   VARCHAR2(1)   ck_hat_mat     CHECK          'L', 'P', 'F' 만 등장가능
- hatsize    VARCHAR2(2)   ck_hat_siz     CHECK          'XS', 'S', 'M', 'L', 'XL' 만 등장가능
+ hat_size    VARCHAR2(2)   ck_hat_siz     CHECK          'XS', 'S', 'M', 'L', 'XL' 만 등장가능
  color      VARCHAR2(10)
  price      NUMBER(6, 2)
  quantity   NUMBER(4)
