@@ -1,0 +1,136 @@
+============================================================================
+테이블 생성 DDL 작성
+
+테이블명 : hat
+
+ 컬럼 이름, 컬타입(크기), 제약조건 이름, 제약조건 타입, 제약조건 구체 내용
+ hatid      VARCHAR2(5)   pk_hat         PRIMARY KEY
+ type       VARCHAR2(1)   ck_hat_type    CHECK          'B', 'S', 'H', 'C', 'F' 만 등장가능
+ material   VARCHAR2(1)   ck_hat_mat     CHECK          'L', 'P', 'F' 만 등장가능
+ hatsize    VARCHAR2(2)   ck_hat_siz     CHECK          'XS', 'S', 'M', 'L', 'XL' 만 등장가능
+ color      VARCHAR2(10)
+ price      NUMBER(6, 2)
+ quantity   NUMBER(4)
+ gender     VARCHAR2(1)   ck_hat_gender  CHECK          'M', 'F', 'U' 만 등장가능
+ regdt      DATE DEFAULT sysdate
+ moddt      DATE
+
+
+
+----------------------------------------------------------------------------
+자바 아키텍처 구성 패키지
+프로젝트명 : lab12-이름.Hat
+----------------------------------------------------------------------------
+
+com.hat.vo
+  => Hat(클래스)
+com.hat.dao
+  => HatDaoIf (인터페이스)
+  => HatDaoJdbcImpl (클래스)
+  => HatDaoMybatisImpl (클래스)
+com.hat.view
+  => HatViewIf (인터페이스: +display(Object object); 추상 메소드 선언)
+  => HatListView (클래스 Book list response 와 같은 구현)
+  => HatDetaileView (클래스 : 이전 Book single response 와 같은 구현)
+  => HatMessageView (클래스)
+  => HatErrorView (클래스 MessageView 와 동일하나 구현을 System.err.println(); 으로 구현)
+com.hat.factory
+  => HatViewFactory (클래스 Book 에서 RespFactory 와 같은 구현)
+  => HatDaoFactory (클래스 Book 에서 DaoFactory 와 같은 구현)
+com.hat.controller
+  => HatController (클래스 BookManager 와 같은 구현)
+com.hat.test
+  => HatTest (클래스 main() 메소드가 있는 실행 클래스. 
+              컨트롤러 객체 인스턴스를 생성하여, 컨트롤러에 구현된 
+              insert, update, delete, select 메소드 호출로 각 작업을 진행하는 코드를 
+              스스로 작성하도록 합니다.)
+com.hat.mybatis
+  => MybatisClient
+com.hat.exception
+  => HatDuplicateException
+  => HatNotFountException
+
+프로젝트에 sql 폴더생성
+  => 위에세 요구하는 hat 테이블 DDL 구문 hat.sql 파일로 만들고 그 안에 작성
+=================================================
+클래스 이름 : Hat
+-------------------------------------------------
+멤버변수 :
+  hatId     : String : 모자제품의 일련 번호(HT001 로 일련번호를 줄 용도)
+  type      : String : 모자의 종류(페도라:F, 썬캡:S, 베레모:B, 후드:H, 카우보이:C 등이 저장)
+  material  : String : 모자의 소재(가죽:L, 플라스틱:P, 천:F 등)
+  hatSize   : String : 모자 크리('XS' 등의 글자로 표기함)
+  color     : String : 모자의 색상
+  price     : double : 모자의 가격
+  quantity  : int    : 재고 수량
+  gender    : String   : 사용성별 (M:남성, F:여성, U:공용 으로 설정)
+  regdt     : String : DB 등록일
+  moddt     : String : DB 수정일
+-------------------------------------------------
+생성자
+  1. 기본생성자
+  2. hatId 만 받는 생성자
+  3. hatId, tpye, material 받는 생성자
+  4. 모든 멤버 변수를 초기화하는 생성자 중복 정의
+-------------------------------------------------
+메소드
+  1. 각 필드의 getter, setter
+  2. hashCode, equals : hatId 만으로 재정의
+  3. toString() 재정의
+-------------------------------------------------
+
+=================================================
+클래스 이름 : HatController
+-------------------------------------------------
+메소드
+  1. public void insert(Hat hat) : 한 건 입력 후 입력 성공/실패 메시지 처리(메시지 처리는 뷰를 사용)
+  2. public void select()        : 전체목록 조회 후 전체 목록 출력(출력은 뷰를 사용)
+  3. public void select(Hat hat) : 한 건 조회 후 한 건 출력(출력은 뷰를 사용)
+  4. public void update(Hat hat) : 한 건 수정 후 성공/실패 메시지 처리(출력은 뷰를 사용)
+  5. public void delete()        : 전건 삭제 후 메시지 처리(출력은 뷰를 사용)
+  6. public void delete(Hat hat) : 한 건 삭제 후 메시지 처리(출력은 뷰를 사용)
+
+
+=================================================
+인터페이스 이름 : HatDaoIf
+-------------------------------------------------
+메소드
+  1. public int insert(Hat hat) : 한 건 입력 후 입력 성공 건수 리턴
+  2. public List<Hat> select()  : 전체목록 조회 후 전체 목록을 List<Hat> 타입을 리턴
+  3. public Hat select(Hat hat) : 한 건 조회 후 한 건 Hat 타입으로 포장하여 리턴
+  4. public int update(Hat hat) : 한 건 수정 후 성공 건수 리턴
+  5. public int delete()        : 전건 삭제 후 삭제 성공 건수 리턴
+  6. public int delete(Hat hat) : 한 건 삭제 후 삭제 성공 건수 리턴
+
+
+=================================================
+클래스 이름 : HatDaoJdbcImple, HatDaoMybatisImple
+              두 클래스는 HatDaoIf 인터페이스를 구현하는 클래스로 작성
+
+Jdbc, Mybatis 각각으로 모두 구현할 것.
+각 구현에 따른 쿼리를 작성하여 돌아가는지 확인 후 자바에 적용하는 순서로 작업할 것.
+Jdbc 구현의 경우 update(Hat hat) 메소드에서 실행할 쿼리를 
+     모든 필드를 업데이트 하는 쿼리로 작성할 것.
+Mybatis 구현의 경우 update 메소드에서 수행할 쿼리는 
+     동적 쿼리로 구성할 것. 수업에서 진행했던 동적 쿼리 & trim 부분 참고.
+     Mybatis 의 경우 로깅까지 구현하여 작성할 것.
+     매퍼 인터페이스로 구현할 것.
+31일차 mybatis.logging 참고하여 구현할 것.
+
+-------------------------------------------------
+JDBC 구현 Mybatis 구현을 모두 할 줄 알아야 현장에서 일할 수 있다는 것을 명심하시고
+JDBC 구현같이 진행했던 프로젝트, 
+Mybatis 구현 내용 참고 하여 이 과제를 무슨 일이 있어도 일주일 안에 완성시켜야만 합니다.
+
+
+요구하는 view 인터페이스와 view 구현 클래스들의 내용은 Book 의 response 인터페이스와 그 
+구현 클래스들의 관계와 동일하니 그 관계를 잘 파악해서 
+전체 프로그그램을 완성하기 바랍니다.
+
+
+
+
+
+
+
+
